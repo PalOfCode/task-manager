@@ -1,36 +1,123 @@
-# Task Manager Backend
+# 📝 Task Manager
 
-Node.js + Express + SQLite backend for the Task Manager project.
+A full-stack Task Manager web application built with HTML, CSS, JavaScript, Node.js, Express.js, and SQLite.
 
-## Setup
+The application allows users to securely register, log in, manage their tasks, update their profile, customize settings, and track task progress.
 
-```bash
-cd backend
-npm install
-```
+---
 
-Copy `.env.example` to `.env` and set a strong `JWT_SECRET`.
+## 🚀 Features
 
-```bash
-npm start
-```
+### 🔐 Authentication
+- User Registration
+- User Login
+- JWT-based Authentication
+- Protected API Routes
+- Secure Logout
+- Forgot Password
+- Change Password
 
-API: `http://localhost:5000`
+### 📋 Task Management
+- Create new tasks
+- Edit existing tasks
+- Delete tasks
+- Mark tasks as completed
+- Task status management
+- Task priority management
+- Due date support
+- Search tasks
+- Filter tasks by status
+- Filter tasks by priority
+- Filter tasks by due date
+- Clear all tasks
 
-Health check: `http://localhost:5000/api/health`
+### 📊 Dashboard
+- Total task count
+- Pending tasks
+- In-progress tasks
+- Completed tasks
+- Task analytics
+- Task progress tracking
 
-## Endpoints
+### 👤 Profile
+- View profile
+- Update name
+- View registered email
+- Change password
+- Logout
 
-Auth: `POST /api/auth/register`, `POST /api/auth/login`, `POST /api/auth/forgot-password`, `POST /api/auth/reset-password`
+### ⚙️ Settings
+- Dark mode
+- Notification settings
+- Default task priority
+- Clear all tasks
+- Account management
 
-Tasks: `GET/POST /api/tasks`, `PUT/DELETE /api/tasks/:id`, `DELETE /api/tasks`
+---
 
-Profile: `GET/PUT /api/profile`, `PUT /api/profile/password`
+## 🛠️ Technologies Used
 
-Settings: `GET/PUT /api/settings`
+### Frontend
+- HTML5
+- CSS3
+- JavaScript
+- LocalStorage
 
-Protected routes require `Authorization: Bearer <token>`.
+### Backend
+- Node.js
+- Express.js
+- REST API
+- JWT Authentication
+- CORS
+- dotenv
 
-## Important
+### Database
+- SQLite
 
-Your existing frontend currently uses LocalStorage. The next step is to replace those LocalStorage operations with `fetch()` calls to this API. Passwords are hashed in the backend with bcrypt and authenticated with JWT.
+### Development Tools
+- Visual Studio Code
+- Git
+- GitHub
+- VS Code Live Preview
+
+---
+
+## 📁 Project Structure
+
+```text
+TASK MANAGER/
+│
+├── backend/
+│   ├── middleware/
+│   │   └── auth.js
+│   │
+│   ├── routes/
+│   │   ├── auth.js
+│   │   ├── profile.js
+│   │   ├── settings.js
+│   │   └── tasks.js
+│   │
+│   ├── .env
+│   ├── .env.example
+│   ├── db.js
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── README.md
+│   └── server.js
+│
+├── index.html
+├── login.html
+├── register.html
+├── dashboard.html
+├── profile.html
+├── settings.html
+├── forgot-password.html
+│
+├── auth.js
+├── script.js
+├── theme.js
+├── settings.js
+├── style.css
+│
+├── .gitignore
+└── README.md
