@@ -1,89 +1,340 @@
 // ============================================================
-// TASK MANAGER - AUTHENTICATION
-// Register | Login | Logout | Forgot Password | Profile
-// Multiple Account System
+// TASK MANAGER - FRONTEND AUTHENTICATION
+// Backend API + JWT Authentication
+//
+// Register
+// Login
+// Logout
+// Forgot Password
+// Reset Password
+// Profile
+// Change Password
 // ============================================================
 
 document.addEventListener("DOMContentLoaded", function () {
 
     // ========================================================
-    // USER STORAGE
+    // BACKEND API
     // ========================================================
 
-    function getUsers() {
+    const API_BASE_URL = "http://localhost:5000/api";
 
-        const data =
-            localStorage.getItem("users");
 
-        if (!data) {
-            return [];
+    // ========================================================
+    // TOAST MESSAGE
+    // ========================================================
+
+    function showToast(message, type = "success") {
+
+        const oldToast =
+            document.querySelector(".auth-toast");
+
+        if (oldToast) {
+            oldToast.remove();
         }
+
+
+        const toast =
+            document.createElement("div");
+
+        toast.className =
+            "auth-toast " + type;
+
+
+        const icon =
+            type === "error"
+                ? "!"
+                : "✓";
+
+
+        toast.innerHTML = `
+            <span class="auth-toast-icon">
+                ${icon}
+            </span>
+
+            <span class="auth-toast-text">
+                ${escapeHTML(message)}
+            </span>
+        `;
+
+
+        toast.style.position = "fixed";
+        toast.style.top = "25px";
+        toast.style.right = "25px";
+        toast.style.zIndex = "99999";
+        toast.style.display = "flex";
+        toast.style.alignItems = "center";
+        toast.style.gap = "10px";
+        toast.style.padding = "14px 20px";
+        toast.style.borderRadius = "10px";
+        toast.style.background =
+            type === "error"
+                ? "#dc3545"
+                : "#198754";
+        toast.style.color = "#ffffff";
+        toast.style.fontSize = "14px";
+        toast.style.fontWeight = "600";
+        toast.style.boxShadow =
+            "0 10px 30px rgba(0,0,0,0.20)";
+
+
+        document.body.appendChild(toast);
+
+
+        setTimeout(function () {
+
+            toast.style.opacity = "0";
+            toast.style.transform =
+                "translateY(-10px)";
+            toast.style.transition =
+                "all 0.3s ease";
+
+        }, 2500);
+
+
+        setTimeout(function () {
+
+            toast.remove();
+
+        }, 3000);
+
+    }
+
+
+    // ========================================================
+    // ESCAPE HTML
+    // ========================================================
+
+    function escapeHTML(value) {
+
+        const div =
+            document.createElement("div");
+
+        div.textContent =
+            value == null
+                ? ""
+                : String(value);
+
+        return div.innerHTML;
+
+    }
+
+
+    // ========================================================
+    // API REQUEST HELPER
+    // ========================================================
+
+    async function apiRequest(
+        endpoint,
+        options = {}
+    ) {
 
         try {
 
-            const users =
-                JSON.parse(data);
+            const response =
+                await fetch(
+                    API_BASE_URL + endpoint,
+                    {
+                        ...options,
 
-            return Array.isArray(users)
-                ? users
-                : [];
+                        headers: {
+                            "Content-Type":
+                                "application/json",
+
+                            ...(options.headers || {})
+                        }
+                    }
+                );
+
+
+            let data = {};
+
+            try {
+
+                data =
+                    await response.json();
+
+            } catch (error) {
+
+                data = {};
+
+            }
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.message ||
+                    "Something went wrong."
+                );
+
+            }
+
+
+            return data;
 
         } catch (error) {
 
             console.error(
-                "Users data error:",
+                "API Error:",
                 error
             );
 
-            return [];
+
+            if (
+                error.name ===
+                "TypeError"
+            ) {
+
+                throw new Error(
+                    "Cannot connect to server. Please make sure the backend is running."
+                );
+
+            }
+
+
+            throw error;
+
         }
+
     }
 
 
-    function saveUsers(users) {
+    // ========================================================
+    // TOKEN
+    // ========================================================
 
-        localStorage.setItem(
-            "users",
-            JSON.stringify(users)
+    function getToken() {
+
+        return localStorage.getItem(
+            "authToken"
         );
-    }
 
+    }
 
 
     // ========================================================
     // CURRENT USER
     // ========================================================
 
-    function getCurrentUserId() {
+    function getStoredUser() {
 
-        return localStorage.getItem(
-            "currentUserId"
-        );
-    }
+        const data =
+            localStorage.getItem(
+                "currentUser"
+            );
 
 
-    function getCurrentUser() {
-
-        const userId =
-            getCurrentUserId();
-
-        if (!userId) {
+        if (!data) {
             return null;
         }
 
-        const users =
-            getUsers();
 
-        return users.find(
-            function (user) {
+        try {
 
-                return String(user.id) ===
-                    String(userId);
+            return JSON.parse(data);
 
-            }
-        ) || null;
+        } catch (error) {
+
+            return null;
+
+        }
+
     }
 
+
+    // ========================================================
+    // SAVE LOGIN SESSION
+    // ========================================================
+
+    function saveLoginSession(
+        token,
+        user
+    ) {
+
+        localStorage.setItem(
+            "authToken",
+            token
+        );
+
+
+        localStorage.setItem(
+            "currentUser",
+            JSON.stringify(user)
+        );
+
+
+        // Keep these keys because
+        // your existing dashboard/profile
+        // code uses them.
+
+        localStorage.setItem(
+            "loggedIn",
+            "true"
+        );
+
+
+        localStorage.setItem(
+            "currentUserId",
+            String(user.id)
+        );
+
+
+        localStorage.setItem(
+            "userName",
+            user.name || "User"
+        );
+
+
+        localStorage.setItem(
+            "userEmail",
+            user.email || ""
+        );
+
+    }
+
+
+    // ========================================================
+    // CLEAR LOGIN SESSION
+    // ========================================================
+
+    function clearLoginSession() {
+
+        localStorage.removeItem(
+            "authToken"
+        );
+
+
+        localStorage.removeItem(
+            "currentUser"
+        );
+
+
+        localStorage.removeItem(
+            "loggedIn"
+        );
+
+
+        localStorage.removeItem(
+            "currentUserId"
+        );
+
+
+        localStorage.removeItem(
+            "userName"
+        );
+
+
+        localStorage.removeItem(
+            "userEmail"
+        );
+
+
+        localStorage.removeItem(
+            "rememberMe"
+        );
+
+    }
 
 
     // ========================================================
@@ -92,13 +343,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function isLoggedIn() {
 
-        return (
-            localStorage.getItem(
-                "loggedIn"
-            ) === "true"
+        return Boolean(
+            getToken()
         );
+
     }
 
+
+    // ========================================================
+    // REQUIRE LOGIN
+    // ========================================================
 
     function requireLogin() {
 
@@ -109,9 +363,36 @@ document.addEventListener("DOMContentLoaded", function () {
             );
 
             return false;
+
         }
 
+
         return true;
+
+    }
+
+
+    // ========================================================
+    // GET INITIAL
+    // ========================================================
+
+    function getInitial(name) {
+
+        if (
+            !name ||
+            String(name).trim() === ""
+        ) {
+
+            return "U";
+
+        }
+
+
+        return String(name)
+            .trim()
+            .charAt(0)
+            .toUpperCase();
+
     }
 
 
@@ -130,7 +411,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         registerForm.addEventListener(
             "submit",
-            function (event) {
+            async function (event) {
 
                 event.preventDefault();
 
@@ -159,10 +440,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     );
 
 
-                // ====================================================
-                // CHECK FORM
-                // ====================================================
-
                 if (
                     !nameInput ||
                     !emailInput ||
@@ -170,17 +447,15 @@ document.addEventListener("DOMContentLoaded", function () {
                     !confirmPasswordInput
                 ) {
 
-                    alert(
-                        "Registration form is incomplete."
+                    showToast(
+                        "Registration form is incomplete.",
+                        "error"
                     );
 
                     return;
+
                 }
 
-
-                // ====================================================
-                // GET VALUES
-                // ====================================================
 
                 const name =
                     nameInput.value.trim();
@@ -200,29 +475,27 @@ document.addEventListener("DOMContentLoaded", function () {
                     confirmPasswordInput.value;
 
 
+                // ------------------------------------------------
+                // NAME
+                // ------------------------------------------------
 
-                // ====================================================
-                // NAME VALIDATION
-                // ====================================================
+                if (name.length < 2) {
 
-                if (
-                    name.length < 2
-                ) {
-
-                    alert(
-                        "Please enter your full name."
+                    showToast(
+                        "Please enter your full name.",
+                        "error"
                     );
 
                     nameInput.focus();
 
                     return;
+
                 }
 
 
-
-                // ====================================================
-                // EMAIL VALIDATION
-                // ====================================================
+                // ------------------------------------------------
+                // EMAIL
+                // ------------------------------------------------
 
                 const emailPattern =
                     /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -234,172 +507,139 @@ document.addEventListener("DOMContentLoaded", function () {
                     )
                 ) {
 
-                    alert(
-                        "Please enter a valid email address."
+                    showToast(
+                        "Please enter a valid email address.",
+                        "error"
                     );
 
                     emailInput.focus();
 
                     return;
+
                 }
 
 
-
-                // ====================================================
-                // PASSWORD VALIDATION
-                // ====================================================
+                // ------------------------------------------------
+                // PASSWORD
+                // ------------------------------------------------
 
                 if (
                     password.length < 6
                 ) {
 
-                    alert(
-                        "Password must contain at least 6 characters."
+                    showToast(
+                        "Password must contain at least 6 characters.",
+                        "error"
                     );
 
                     passwordInput.focus();
 
                     return;
+
                 }
 
 
-
-                // ====================================================
+                // ------------------------------------------------
                 // CONFIRM PASSWORD
-                // ====================================================
+                // ------------------------------------------------
 
                 if (
                     password !==
                     confirmPassword
                 ) {
 
-                    alert(
-                        "Passwords do not match."
+                    showToast(
+                        "Passwords do not match.",
+                        "error"
                     );
 
                     confirmPasswordInput.focus();
 
                     return;
+
                 }
 
 
+                // ------------------------------------------------
+                // DISABLE BUTTON
+                // ------------------------------------------------
 
-                // ====================================================
-                // GET ALL USERS
-                // ====================================================
-
-                const users =
-                    getUsers();
+                const submitButton =
+                    registerForm.querySelector(
+                        'button[type="submit"]'
+                    );
 
 
+                if (submitButton) {
 
-                // ====================================================
-                // CHECK EXISTING EMAIL
-                // ====================================================
+                    submitButton.disabled =
+                        true;
 
-                const existingUser =
-                    users.find(
-                        function (user) {
+                    submitButton.textContent =
+                        "Creating Account...";
 
-                            return (
-                                user.email &&
-                                user.email
-                                    .trim()
-                                    .toLowerCase() ===
-                                email
+                }
+
+
+                try {
+
+                    const data =
+                        await apiRequest(
+                            "/auth/register",
+                            {
+                                method: "POST",
+
+                                body:
+                                    JSON.stringify({
+                                        name,
+                                        email,
+                                        password
+                                    })
+                            }
+                        );
+
+
+                    showToast(
+                        data.message ||
+                        "Account created successfully!"
+                    );
+
+
+                    registerForm.reset();
+
+
+                    setTimeout(
+                        function () {
+
+                            window.location.replace(
+                                "login.html"
                             );
 
-                        }
+                        },
+                        1000
                     );
 
 
-                if (existingUser) {
+                } catch (error) {
 
-                    alert(
-                        "This email is already registered. Please use another email."
+                    showToast(
+                        error.message,
+                        "error"
                     );
 
-                    emailInput.focus();
+                } finally {
 
-                    return;
+                    if (submitButton) {
+
+                        submitButton.disabled =
+                            false;
+
+                        submitButton.textContent =
+                            "Create Account";
+
+                    }
+
                 }
-
-
-
-                // ====================================================
-                // CREATE USER
-                // ====================================================
-
-                const newUser = {
-
-                    id:
-                        Date.now().toString(),
-
-                    name:
-                        name,
-
-                    email:
-                        email,
-
-                    password:
-                        password
-
-                };
-
-
-                users.push(
-                    newUser
-                );
-
-
-                saveUsers(
-                    users
-                );
-
-
-
-                // ====================================================
-                // CLEAR LOGIN SESSION
-                // ====================================================
-
-                localStorage.removeItem(
-                    "loggedIn"
-                );
-
-
-                localStorage.removeItem(
-                    "currentUserId"
-                );
-
-
-                localStorage.removeItem(
-                    "userName"
-                );
-
-
-                localStorage.removeItem(
-                    "userEmail"
-                );
-
-
-                localStorage.removeItem(
-                    "rememberMe"
-                );
-
-
-
-                // ====================================================
-                // SUCCESS
-                // ====================================================
-
-                alert(
-                    "Account created successfully!"
-                );
-
-
-                window.location.replace(
-                    "login.html"
-                );
 
             }
         );
@@ -422,7 +662,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         loginForm.addEventListener(
             "submit",
-            function (event) {
+            async function (event) {
 
                 event.preventDefault();
 
@@ -439,26 +679,20 @@ document.addEventListener("DOMContentLoaded", function () {
                     );
 
 
-                // ====================================================
-                // CHECK FORM
-                // ====================================================
-
                 if (
                     !emailInput ||
                     !passwordInput
                 ) {
 
-                    alert(
-                        "Login form is incomplete."
+                    showToast(
+                        "Login form is incomplete.",
+                        "error"
                     );
 
                     return;
+
                 }
 
-
-                // ====================================================
-                // GET VALUES
-                // ====================================================
 
                 const email =
                     emailInput.value
@@ -470,180 +704,138 @@ document.addEventListener("DOMContentLoaded", function () {
                     passwordInput.value;
 
 
+                if (email === "") {
 
-                // ====================================================
-                // VALIDATION
-                // ====================================================
-
-                if (
-                    email === ""
-                ) {
-
-                    alert(
-                        "Please enter your email."
+                    showToast(
+                        "Please enter your email.",
+                        "error"
                     );
 
                     emailInput.focus();
 
                     return;
+
                 }
 
 
-                if (
-                    password === ""
-                ) {
+                if (password === "") {
 
-                    alert(
-                        "Please enter your password."
+                    showToast(
+                        "Please enter your password.",
+                        "error"
                     );
 
                     passwordInput.focus();
 
                     return;
+
                 }
 
 
-
-                // ====================================================
-                // GET USERS
-                // ====================================================
-
-                const users =
-                    getUsers();
-
-
-                if (
-                    users.length === 0
-                ) {
-
-                    alert(
-                        "No account found. Please create an account first."
+                const submitButton =
+                    loginForm.querySelector(
+                        'button[type="submit"]'
                     );
 
-                    return;
+
+                if (submitButton) {
+
+                    submitButton.disabled =
+                        true;
+
+                    submitButton.textContent =
+                        "Logging in...";
+
                 }
 
 
+                try {
 
-                // ====================================================
-                // FIND USER
-                // ====================================================
+                    const data =
+                        await apiRequest(
+                            "/auth/login",
+                            {
+                                method: "POST",
 
-                const user =
-                    users.find(
-                        function (account) {
+                                body:
+                                    JSON.stringify({
+                                        email,
+                                        password
+                                    })
+                            }
+                        );
 
-                            return (
-                                account.email &&
-                                account.email
-                                    .trim()
-                                    .toLowerCase() ===
-                                email
+
+                    saveLoginSession(
+                        data.token,
+                        data.user
+                    );
+
+
+                    const rememberMe =
+                        document.getElementById(
+                            "rememberMe"
+                        );
+
+
+                    if (
+                        rememberMe &&
+                        rememberMe.checked
+                    ) {
+
+                        localStorage.setItem(
+                            "rememberMe",
+                            "true"
+                        );
+
+                    } else {
+
+                        localStorage.removeItem(
+                            "rememberMe"
+                        );
+
+                    }
+
+
+                    showToast(
+                        data.message ||
+                        "Login successful!"
+                    );
+
+
+                    setTimeout(
+                        function () {
+
+                            window.location.replace(
+                                "dashboard.html"
                             );
 
-                        }
+                        },
+                        600
                     );
 
 
-                if (!user) {
+                } catch (error) {
 
-                    alert(
-                        "Incorrect email address."
+                    showToast(
+                        error.message ||
+                        "Invalid email or password.",
+                        "error"
                     );
 
-                    emailInput.focus();
+                } finally {
 
-                    return;
-                }
+                    if (submitButton) {
 
+                        submitButton.disabled =
+                            false;
 
+                        submitButton.textContent =
+                            "Login";
 
-                // ====================================================
-                // PASSWORD CHECK
-                // ====================================================
-
-                if (
-                    user.password !==
-                    password
-                ) {
-
-                    alert(
-                        "Incorrect password."
-                    );
-
-                    passwordInput.focus();
-
-                    return;
-                }
-
-
-
-                // ====================================================
-                // LOGIN SUCCESS
-                // ====================================================
-
-                localStorage.setItem(
-                    "loggedIn",
-                    "true"
-                );
-
-
-                localStorage.setItem(
-                    "currentUserId",
-                    String(user.id)
-                );
-
-
-                localStorage.setItem(
-                    "userName",
-                    user.name || "User"
-                );
-
-
-                localStorage.setItem(
-                    "userEmail",
-                    user.email
-                );
-
-
-
-                // ====================================================
-                // REMEMBER ME
-                // ====================================================
-
-                const rememberMe =
-                    document.getElementById(
-                        "rememberMe"
-                    );
-
-
-                if (
-                    rememberMe &&
-                    rememberMe.checked
-                ) {
-
-                    localStorage.setItem(
-                        "rememberMe",
-                        "true"
-                    );
-
-                } else {
-
-                    localStorage.removeItem(
-                        "rememberMe"
-                    );
+                    }
 
                 }
-
-
-
-                // ====================================================
-                // GO DASHBOARD
-                // ====================================================
-
-                window.location.replace(
-                    "dashboard.html"
-                );
 
             }
         );
@@ -672,29 +864,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     event.preventDefault();
 
 
-                    localStorage.removeItem(
-                        "loggedIn"
-                    );
-
-
-                    localStorage.removeItem(
-                        "currentUserId"
-                    );
-
-
-                    localStorage.removeItem(
-                        "userName"
-                    );
-
-
-                    localStorage.removeItem(
-                        "userEmail"
-                    );
-
-
-                    localStorage.removeItem(
-                        "rememberMe"
-                    );
+                    clearLoginSession();
 
 
                     window.location.replace(
@@ -710,7 +880,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // ========================================================
-    // FORGOT PASSWORD / RESET PASSWORD
+    // FORGOT PASSWORD
     // ========================================================
 
     const forgotForm =
@@ -723,14 +893,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
         forgotForm.addEventListener(
             "submit",
-            function (event) {
+            async function (event) {
 
                 event.preventDefault();
 
-
-                // ====================================================
-                // INPUTS
-                // ====================================================
 
                 const emailInput =
                     document.getElementById(
@@ -756,18 +922,15 @@ document.addEventListener("DOMContentLoaded", function () {
                     !confirmPasswordInput
                 ) {
 
-                    alert(
-                        "Password reset form is incomplete."
+                    showToast(
+                        "Password reset form is incomplete.",
+                        "error"
                     );
 
                     return;
+
                 }
 
-
-
-                // ====================================================
-                // VALUES
-                // ====================================================
 
                 const email =
                     emailInput.value
@@ -783,11 +946,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     confirmPasswordInput.value;
 
 
-
-                // ====================================================
-                // EMAIL VALIDATION
-                // ====================================================
-
                 const emailPattern =
                     /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -798,168 +956,183 @@ document.addEventListener("DOMContentLoaded", function () {
                     )
                 ) {
 
-                    alert(
-                        "Please enter a valid email address."
+                    showToast(
+                        "Please enter a valid email address.",
+                        "error"
                     );
 
                     emailInput.focus();
 
                     return;
+
                 }
 
-
-
-                // ====================================================
-                // PASSWORD VALIDATION
-                // ====================================================
 
                 if (
                     newPassword.length < 6
                 ) {
 
-                    alert(
-                        "New password must contain at least 6 characters."
+                    showToast(
+                        "New password must contain at least 6 characters.",
+                        "error"
                     );
 
                     newPasswordInput.focus();
 
                     return;
+
                 }
 
-
-
-                // ====================================================
-                // CONFIRM PASSWORD
-                // ====================================================
 
                 if (
                     newPassword !==
                     confirmPassword
                 ) {
 
-                    alert(
-                        "New passwords do not match."
+                    showToast(
+                        "New passwords do not match.",
+                        "error"
                     );
 
                     confirmPasswordInput.focus();
 
                     return;
+
                 }
 
 
-
-                // ====================================================
-                // GET USERS
-                // ====================================================
-
-                const users =
-                    getUsers();
-
-
-                if (
-                    users.length === 0
-                ) {
-
-                    alert(
-                        "No account found. Please create an account first."
+                const submitButton =
+                    forgotForm.querySelector(
+                        'button[type="submit"]'
                     );
 
-                    return;
+
+                if (submitButton) {
+
+                    submitButton.disabled =
+                        true;
+
+                    submitButton.textContent =
+                        "Resetting Password...";
+
                 }
 
 
+                try {
 
-                // ====================================================
-                // FIND USER
-                // ====================================================
+                    // ------------------------------------------------
+                    // STEP 1:
+                    // Request reset token
+                    // ------------------------------------------------
 
-                const userIndex =
-                    users.findIndex(
-                        function (account) {
+                    const requestData =
+                        await apiRequest(
+                            "/auth/forgot-password",
+                            {
+                                method: "POST",
 
-                            return (
-                                account.email &&
-                                account.email
-                                    .trim()
-                                    .toLowerCase() ===
-                                email
+                                body:
+                                    JSON.stringify({
+                                        email
+                                    })
+                            }
+                        );
+
+
+                    // ------------------------------------------------
+                    // IMPORTANT:
+                    // This backend is currently a local/demo system.
+                    // It returns the reset token directly.
+                    //
+                    // Production:
+                    // Send the token through email instead.
+                    // ------------------------------------------------
+
+                    const resetToken =
+                        requestData.resetToken;
+
+
+                    if (!resetToken) {
+
+                        throw new Error(
+                            "No reset token received. Please check the email address."
+                        );
+
+                    }
+
+
+                    // ------------------------------------------------
+                    // STEP 2:
+                    // Reset password
+                    // ------------------------------------------------
+
+                    const resetData =
+                        await apiRequest(
+                            "/auth/reset-password",
+                            {
+                                method: "POST",
+
+                                body:
+                                    JSON.stringify({
+                                        token:
+                                            resetToken,
+
+                                        newPassword:
+                                            newPassword
+                                    })
+                            }
+                        );
+
+
+                    // ------------------------------------------------
+                    // CLEAR SESSION
+                    // ------------------------------------------------
+
+                    clearLoginSession();
+
+
+                    showToast(
+                        resetData.message ||
+                        "Password reset successfully!"
+                    );
+
+
+                    forgotForm.reset();
+
+
+                    setTimeout(
+                        function () {
+
+                            window.location.replace(
+                                "login.html"
                             );
 
-                        }
+                        },
+                        1200
                     );
 
 
-                if (
-                    userIndex === -1
-                ) {
+                } catch (error) {
 
-                    alert(
-                        "No account found with this email."
+                    showToast(
+                        error.message ||
+                        "Password reset failed.",
+                        "error"
                     );
 
-                    emailInput.focus();
+                } finally {
 
-                    return;
+                    if (submitButton) {
+
+                        submitButton.disabled =
+                            false;
+
+                        submitButton.textContent =
+                            "Reset Password";
+
+                    }
+
                 }
-
-
-
-                // ====================================================
-                // UPDATE PASSWORD
-                // ====================================================
-
-                users[userIndex].password =
-                    newPassword;
-
-
-                saveUsers(
-                    users
-                );
-
-
-
-                // ====================================================
-                // CLEAR CURRENT SESSION
-                // ====================================================
-
-                localStorage.removeItem(
-                    "loggedIn"
-                );
-
-
-                localStorage.removeItem(
-                    "currentUserId"
-                );
-
-
-                localStorage.removeItem(
-                    "userName"
-                );
-
-
-                localStorage.removeItem(
-                    "userEmail"
-                );
-
-
-                localStorage.removeItem(
-                    "rememberMe"
-                );
-
-
-
-                // ====================================================
-                // SUCCESS
-                // ====================================================
-
-                alert(
-                    "Password reset successfully! Please login with your new password."
-                );
-
-
-                window.location.replace(
-                    "login.html"
-                );
 
             }
         );
@@ -971,18 +1144,6 @@ document.addEventListener("DOMContentLoaded", function () {
     // ========================================================
     // PROFILE PAGE
     // ========================================================
-
-    const profilePage =
-        document.getElementById(
-            "profilePage"
-        );
-
-
-    const profileSection =
-        document.querySelector(
-            ".profile-section"
-        );
-
 
     const profileForm =
         document.getElementById(
@@ -996,11 +1157,16 @@ document.addEventListener("DOMContentLoaded", function () {
         );
 
 
+    const profileSection =
+        document.querySelector(
+            ".profile-section"
+        );
+
+
     const isProfilePage =
-        profilePage ||
-        profileSection ||
         profileForm ||
-        changePasswordForm;
+        changePasswordForm ||
+        profileSection;
 
 
     if (isProfilePage) {
@@ -1010,34 +1176,104 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
 
-        const user =
-            getCurrentUser();
+        loadProfile();
+
+    }
 
 
-        if (!user) {
 
-            localStorage.removeItem(
-                "loggedIn"
+    // ========================================================
+    // LOAD PROFILE
+    // ========================================================
+
+    async function loadProfile() {
+
+        try {
+
+            const data =
+                await apiRequest(
+                    "/profile",
+                    {
+                        method: "GET",
+
+                        headers: {
+                            Authorization:
+                                "Bearer " +
+                                getToken()
+                        }
+                    }
+                );
+
+
+            const user =
+                data.user;
+
+
+            // Update stored user
+
+            localStorage.setItem(
+                "currentUser",
+                JSON.stringify(user)
             );
 
 
-            localStorage.removeItem(
-                "currentUserId"
+            localStorage.setItem(
+                "currentUserId",
+                String(user.id)
             );
 
 
-            window.location.replace(
-                "login.html"
+            localStorage.setItem(
+                "userName",
+                user.name || "User"
             );
 
-            return;
+
+            localStorage.setItem(
+                "userEmail",
+                user.email || ""
+            );
+
+
+            updateProfileUI(user);
+
+
+        } catch (error) {
+
+            console.error(
+                "Profile loading error:",
+                error
+            );
+
+
+            if (
+                error.message.includes(
+                    "Invalid or expired token"
+                ) ||
+                error.message.includes(
+                    "Authentication"
+                )
+            ) {
+
+                clearLoginSession();
+
+                window.location.replace(
+                    "login.html"
+                );
+
+            }
+
         }
 
+    }
 
 
-        // ====================================================
-        // PROFILE ELEMENTS
-        // ====================================================
+
+    // ========================================================
+    // UPDATE PROFILE UI
+    // ========================================================
+
+    function updateProfileUI(user) {
 
         const profileName =
             document.getElementById(
@@ -1081,15 +1317,35 @@ document.addEventListener("DOMContentLoaded", function () {
             );
 
 
+        const settingsUserName =
+            document.getElementById(
+                "settingsUserName"
+            );
 
-        // ====================================================
-        // DISPLAY PROFILE
-        // ====================================================
+
+        const settingsAvatar =
+            document.getElementById(
+                "settingsAvatar"
+            );
+
+
+        const dashboardName =
+            document.querySelector(
+                ".user-profile strong"
+            );
+
+
+        const dashboardAvatar =
+            document.querySelector(
+                ".user-profile .avatar"
+            );
+
 
         if (profileName) {
 
             profileName.textContent =
                 user.name || "User";
+
         }
 
 
@@ -1097,6 +1353,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             profileEmail.textContent =
                 user.email || "";
+
         }
 
 
@@ -1104,6 +1361,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             profileNameInput.value =
                 user.name || "";
+
         }
 
 
@@ -1112,18 +1370,17 @@ document.addEventListener("DOMContentLoaded", function () {
             profileEmailInput.value =
                 user.email || "";
 
-
-            profileEmailInput.readOnly =
+            profileEmailInput.disabled =
                 true;
+
         }
 
 
         if (profileAvatar) {
 
             profileAvatar.textContent =
-                getInitial(
-                    user.name
-                );
+                getInitial(user.name);
+
         }
 
 
@@ -1131,15 +1388,47 @@ document.addEventListener("DOMContentLoaded", function () {
 
             headerName.textContent =
                 user.name || "User";
+
         }
 
 
         if (headerAvatar) {
 
             headerAvatar.textContent =
-                getInitial(
-                    user.name
-                );
+                getInitial(user.name);
+
+        }
+
+
+        if (settingsUserName) {
+
+            settingsUserName.textContent =
+                user.name || "User";
+
+        }
+
+
+        if (settingsAvatar) {
+
+            settingsAvatar.textContent =
+                getInitial(user.name);
+
+        }
+
+
+        if (dashboardName) {
+
+            dashboardName.textContent =
+                user.name || "User";
+
+        }
+
+
+        if (dashboardAvatar) {
+
+            dashboardAvatar.textContent =
+                getInitial(user.name);
+
         }
 
     }
@@ -1154,35 +1443,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
         profileForm.addEventListener(
             "submit",
-            function (event) {
+            async function (event) {
 
                 event.preventDefault();
 
 
-                if (!isLoggedIn()) {
-
-                    alert(
-                        "Please login first."
-                    );
-
-                    window.location.replace(
-                        "login.html"
-                    );
-
-                    return;
-                }
-
-
-                const currentUser =
-                    getCurrentUser();
-
-
-                if (!currentUser) {
-
-                    alert(
-                        "User account not found."
-                    );
-
+                if (!requireLogin()) {
                     return;
                 }
 
@@ -1195,145 +1461,120 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 if (!nameInput) {
 
-                    alert(
-                        "Name field not found."
+                    showToast(
+                        "Name field not found.",
+                        "error"
                     );
 
                     return;
+
                 }
 
 
-                const newName =
+                const name =
                     nameInput.value.trim();
 
 
-                if (
-                    newName.length < 2
-                ) {
+                if (name.length < 2) {
 
-                    alert(
-                        "Please enter a valid name."
+                    showToast(
+                        "Please enter a valid name.",
+                        "error"
                     );
 
                     nameInput.focus();
 
                     return;
+
                 }
 
 
-
-                // ====================================================
-                // UPDATE USERS ARRAY
-                // ====================================================
-
-                const users =
-                    getUsers();
-
-
-                const index =
-                    users.findIndex(
-                        function (user) {
-
-                            return String(
-                                user.id
-                            ) ===
-                            String(
-                                currentUser.id
-                            );
-
-                        }
+                const submitButton =
+                    profileForm.querySelector(
+                        'button[type="submit"]'
                     );
 
 
-                if (index === -1) {
+                if (submitButton) {
 
-                    alert(
-                        "User account not found."
-                    );
+                    submitButton.disabled =
+                        true;
 
-                    return;
+                    submitButton.textContent =
+                        "Saving...";
+
                 }
 
 
-                users[index].name =
-                    newName;
+                try {
 
+                    const data =
+                        await apiRequest(
+                            "/profile",
+                            {
+                                method: "PUT",
 
-                saveUsers(
-                    users
-                );
+                                headers: {
+                                    Authorization:
+                                        "Bearer " +
+                                        getToken()
+                                },
 
-
-                localStorage.setItem(
-                    "userName",
-                    newName
-                );
-
-
-
-                // ====================================================
-                // UPDATE PAGE
-                // ====================================================
-
-                const profileName =
-                    document.getElementById(
-                        "profileName"
-                    );
-
-
-                const profileAvatar =
-                    document.getElementById(
-                        "profileAvatar"
-                    );
-
-
-                const headerName =
-                    document.getElementById(
-                        "headerName"
-                    );
-
-
-                const headerAvatar =
-                    document.getElementById(
-                        "headerAvatar"
-                    );
-
-
-                if (profileName) {
-
-                    profileName.textContent =
-                        newName;
-                }
-
-
-                if (profileAvatar) {
-
-                    profileAvatar.textContent =
-                        getInitial(
-                            newName
+                                body:
+                                    JSON.stringify({
+                                        name
+                                    })
+                            }
                         );
+
+
+                    const user =
+                        data.user;
+
+
+                    localStorage.setItem(
+                        "currentUser",
+                        JSON.stringify(user)
+                    );
+
+
+                    localStorage.setItem(
+                        "userName",
+                        user.name
+                    );
+
+
+                    updateProfileUI(
+                        user
+                    );
+
+
+                    showToast(
+                        data.message ||
+                        "Profile updated successfully!"
+                    );
+
+
+                } catch (error) {
+
+                    showToast(
+                        error.message,
+                        "error"
+                    );
+
+                } finally {
+
+                    if (submitButton) {
+
+                        submitButton.disabled =
+                            false;
+
+                        submitButton.textContent =
+                            "Save Changes";
+
+                    }
+
                 }
-
-
-                if (headerName) {
-
-                    headerName.textContent =
-                        newName;
-                }
-
-
-                if (headerAvatar) {
-
-                    headerAvatar.textContent =
-                        getInitial(
-                            newName
-                        );
-                }
-
-
-                alert(
-                    "Profile updated successfully!"
-                );
 
             }
         );
@@ -1350,35 +1591,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
         changePasswordForm.addEventListener(
             "submit",
-            function (event) {
+            async function (event) {
 
                 event.preventDefault();
 
 
-                if (!isLoggedIn()) {
-
-                    alert(
-                        "Please login first."
-                    );
-
-                    window.location.replace(
-                        "login.html"
-                    );
-
-                    return;
-                }
-
-
-                const currentUser =
-                    getCurrentUser();
-
-
-                if (!currentUser) {
-
-                    window.location.replace(
-                        "login.html"
-                    );
-
+                if (!requireLogin()) {
                     return;
                 }
 
@@ -1407,15 +1625,17 @@ document.addEventListener("DOMContentLoaded", function () {
                     !confirmPasswordInput
                 ) {
 
-                    alert(
-                        "Password form is incomplete."
+                    showToast(
+                        "Password form is incomplete.",
+                        "error"
                     );
 
                     return;
+
                 }
 
 
-                const oldPassword =
+                const currentPassword =
                     oldPasswordInput.value;
 
 
@@ -1427,114 +1647,125 @@ document.addEventListener("DOMContentLoaded", function () {
                     confirmPasswordInput.value;
 
 
-
-                // ====================================================
-                // CURRENT PASSWORD
-                // ====================================================
-
                 if (
-                    oldPassword !==
-                    currentUser.password
+                    currentPassword === ""
                 ) {
 
-                    alert(
-                        "Current password is incorrect."
+                    showToast(
+                        "Please enter your current password.",
+                        "error"
                     );
 
                     oldPasswordInput.focus();
 
                     return;
+
                 }
 
-
-
-                // ====================================================
-                // NEW PASSWORD
-                // ====================================================
 
                 if (
                     newPassword.length < 6
                 ) {
 
-                    alert(
-                        "New password must contain at least 6 characters."
+                    showToast(
+                        "New password must contain at least 6 characters.",
+                        "error"
                     );
 
                     newPasswordInput.focus();
 
                     return;
+
                 }
 
-
-
-                // ====================================================
-                // CONFIRM
-                // ====================================================
 
                 if (
                     newPassword !==
                     confirmPassword
                 ) {
 
-                    alert(
-                        "New passwords do not match."
+                    showToast(
+                        "New passwords do not match.",
+                        "error"
                     );
 
                     confirmPasswordInput.focus();
 
                     return;
+
                 }
 
 
-
-                // ====================================================
-                // UPDATE PASSWORD
-                // ====================================================
-
-                const users =
-                    getUsers();
-
-
-                const index =
-                    users.findIndex(
-                        function (user) {
-
-                            return String(
-                                user.id
-                            ) ===
-                            String(
-                                currentUser.id
-                            );
-
-                        }
+                const submitButton =
+                    changePasswordForm.querySelector(
+                        'button[type="submit"]'
                     );
 
 
-                if (index === -1) {
+                if (submitButton) {
 
-                    alert(
-                        "User account not found."
-                    );
+                    submitButton.disabled =
+                        true;
 
-                    return;
+                    submitButton.textContent =
+                        "Changing Password...";
+
                 }
 
 
-                users[index].password =
-                    newPassword;
+                try {
+
+                    const data =
+                        await apiRequest(
+                            "/profile/password",
+                            {
+                                method: "PUT",
+
+                                headers: {
+                                    Authorization:
+                                        "Bearer " +
+                                        getToken()
+                                },
+
+                                body:
+                                    JSON.stringify({
+                                        currentPassword,
+                                        newPassword
+                                    })
+                            }
+                        );
 
 
-                saveUsers(
-                    users
-                );
+                    showToast(
+                        data.message ||
+                        "Password changed successfully!"
+                    );
 
 
-                alert(
-                    "Password changed successfully!"
-                );
+                    changePasswordForm.reset();
 
 
-                changePasswordForm.reset();
+                } catch (error) {
+
+                    showToast(
+                        error.message ||
+                        "Unable to change password.",
+                        "error"
+                    );
+
+                } finally {
+
+                    if (submitButton) {
+
+                        submitButton.disabled =
+                            false;
+
+                        submitButton.textContent =
+                            "Change Password";
+
+                    }
+
+                }
 
             }
         );
@@ -1544,45 +1775,85 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // ========================================================
-    // DASHBOARD USER NAME
+    // DASHBOARD USER
     // ========================================================
 
-    const dashboardName =
-        document.querySelector(
-            ".user-profile strong"
-        );
+    function updateDashboardUser() {
+
+        const user =
+            getStoredUser();
 
 
-    const dashboardAvatar =
-        document.querySelector(
-            ".user-profile .avatar"
-        );
+        if (!user) {
+            return;
+        }
+
+
+        const dashboardName =
+            document.querySelector(
+                ".user-profile strong"
+            );
+
+
+        const dashboardAvatar =
+            document.querySelector(
+                ".user-profile .avatar"
+            );
+
+
+        if (dashboardName) {
+
+            dashboardName.textContent =
+                user.name || "User";
+
+        }
+
+
+        if (dashboardAvatar) {
+
+            dashboardAvatar.textContent =
+                getInitial(user.name);
+
+        }
+
+    }
+
+
+    updateDashboardUser();
+
+
+
+    // ========================================================
+    // PROTECTED PAGE CHECK
+    // ========================================================
+
+    const currentPage =
+        window.location.pathname
+            .split("/")
+            .pop()
+            .toLowerCase();
+
+
+    const protectedPages = [
+        "dashboard.html",
+        "profile.html",
+        "settings.html"
+    ];
 
 
     if (
-        isLoggedIn()
+        protectedPages.includes(
+            currentPage
+        )
     ) {
 
-        const user =
-            getCurrentUser();
+        if (!isLoggedIn()) {
 
+            window.location.replace(
+                "login.html"
+            );
 
-        if (user) {
-
-            if (dashboardName) {
-
-                dashboardName.textContent =
-                    user.name || "User";
-            }
-
-
-            if (dashboardAvatar) {
-
-                dashboardAvatar.textContent =
-                    getInitial(
-                        user.name
-                    );
-            }
+            return;
 
         }
 
@@ -1591,24 +1862,65 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // ========================================================
-    // GET INITIAL
+    // LOGIN PAGE REDIRECT
     // ========================================================
 
-    function getInitial(name) {
+    if (
+        currentPage ===
+        "login.html"
+    ) {
 
-        if (
-            !name ||
-            name.trim() === ""
-        ) {
+        if (isLoggedIn()) {
 
-            return "U";
+            // Do not automatically redirect
+            // if user intentionally opened login.
+            //
+            // Keeping this disabled makes
+            // account testing easier.
+
         }
 
-
-        return name
-            .trim()
-            .charAt(0)
-            .toUpperCase();
     }
+
+
+
+    // ========================================================
+    // REGISTER PAGE
+    // ========================================================
+
+    if (
+        currentPage ===
+        "register.html"
+    ) {
+
+        // Register page remains accessible.
+
+    }
+
+
+
+    // ========================================================
+    // EXPORT HELPERS
+    // ========================================================
+
+    window.TaskManagerAuth = {
+
+        getToken:
+            getToken,
+
+        getCurrentUser:
+            getStoredUser,
+
+        isLoggedIn:
+            isLoggedIn,
+
+        logout:
+            clearLoginSession,
+
+        showToast:
+            showToast
+
+    };
+
 
 });
