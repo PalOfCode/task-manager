@@ -17,9 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // BACKEND API
     // ========================================================
 
-    const API_BASE_URL = "http://localhost:5000/api";
-
-
+   const API_BASE_URL = "https://task-manager-utsw.onrender.com/api";
     // ========================================================
     // TOAST MESSAGE
     // ========================================================
