@@ -99,4 +99,30 @@ TASK MANAGER/
 ├── theme.js
 │
 ├── .gitignore
-└── README.md
+└── README.
+---
+## 📸 Screenshots
+
+### 🏠 Home Page
+
+![Home Page](screenshots/home.png)
+
+### 🔐 Login Page
+
+![Login Page](screenshots/login.png)
+
+### 📝 Register Page
+
+![Register Page](screenshots/register.png)
+
+### 📊 Dashboard
+
+![Dashboard](screenshots/dashboard.png)
+
+### 👤 Profile
+
+![Profile](screenshots/profile.png)
+
+### ⚙️ Settings
+
+![Settings](screenshots/settings.png)
