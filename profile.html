@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Profile - Task Manager</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <script src="theme.js"></script>
+
+
+</head>
+
+
+<body class="dashboard-page">
+
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-logo">
+
+            Task<span>Manager</span>
+
+        </div>
+
+
+        <nav class="sidebar-nav">
+
+            <a href="dashboard.html">
+                🏠 Dashboard
+            </a>
+
+            <a href="dashboard.html">
+                📋 All Tasks
+            </a>
+
+            <a href="dashboard.html">
+                ⏳ Pending
+            </a>
+
+            <a href="dashboard.html">
+                ⚡ In Progress
+            </a>
+
+            <a href="dashboard.html">
+                ✓ Completed
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-bottom">
+
+            <a href="profile.html" class="active">
+                👤 Profile
+            </a>
+
+            <a href="login.html" id="logoutBtn">
+                🚪 Logout
+            </a>
+
+        </div>
+
+    </aside>
+
+
+
+    <!-- MAIN -->
+
+    <main class="dashboard-main">
+
+
+        <!-- HEADER -->
+
+        <header class="dashboard-header">
+
+            <div>
+
+                <h1>
+                    My Profile
+                </h1>
+
+                <p>
+                    Manage your account information
+                </p>
+
+            </div>
+
+
+            <div class="user-profile">
+
+                <div
+                    class="avatar"
+                    id="headerAvatar">
+
+                    R
+
+                </div>
+
+
+                <div>
+
+                    <strong id="headerName">
+                        User
+                    </strong>
+
+                    <small>
+                        Student
+                    </small>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+
+        <!-- PROFILE -->
+
+        <section class="profile-section">
+
+
+            <!-- PROFILE CARD -->
+
+            <div class="profile-card">
+
+                <div
+                    class="profile-avatar"
+                    id="profileAvatar">
+
+                    R
+
+                </div>
+
+
+                <h2 id="profileName">
+                    User
+                </h2>
+
+
+                <p id="profileEmail">
+                    user@email.com
+                </p>
+
+            </div>
+
+
+
+            <!-- EDIT PROFILE -->
+
+            <div class="profile-form-card">
+
+                <h2>
+                    Personal Information
+                </h2>
+
+
+                <p>
+                    Update your profile information.
+                </p>
+
+
+                <form id="profileForm">
+
+
+                    <div class="form-group">
+
+                        <label for="profileNameInput">
+                            Full Name
+                        </label>
+
+
+                        <input
+                            type="text"
+                            id="profileNameInput"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="profileEmailInput">
+                            Email Address
+                        </label>
+
+
+                        <input
+                            type="email"
+                            id="profileEmailInput"
+                            disabled
+                        >
+
+                    </div>
+
+
+                    <button
+                        type="submit"
+                        class="primary-btn">
+
+                        Save Changes
+
+                    </button>
+
+                </form>
+
+            </div>
+
+
+
+            <!-- CHANGE PASSWORD -->
+
+            <div class="profile-form-card">
+
+                <h2>
+                    Change Password
+                </h2>
+
+
+                <form id="changePasswordForm">
+
+
+                    <div class="form-group">
+
+                        <label for="oldPassword">
+                            Current Password
+                        </label>
+
+
+                        <input
+                            type="password"
+                            id="oldPassword"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="newPassword">
+                            New Password
+                        </label>
+
+
+                        <input
+                            type="password"
+                            id="newPassword"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="confirmNewPassword">
+                            Confirm New Password
+                        </label>
+
+
+                        <input
+                            type="password"
+                            id="confirmNewPassword"
+                            required
+                        >
+
+                    </div>
+
+
+                    <button
+                        type="submit"
+                        class="primary-btn">
+
+                        Change Password
+
+                    </button>
+
+                </form>
+
+            </div>
+
+
+
+            <!-- LOGOUT -->
+
+            <div>
+
+                <button
+                    type="button"
+                    class="cancel-btn logout-btn">
+
+                    🚪 Logout
+
+                </button>
+
+            </div>
+
+
+        </section>
+
+    </main>
+
+
+
+    <!-- AUTH JS -->
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>

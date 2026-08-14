@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Settings - Task Manager</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+    <!-- Theme -->
+    <script src="theme.js"></script>
+
+</head>
+
+
+<body class="dashboard-page">
+
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-logo">
+
+            Task<span>Manager</span>
+
+        </div>
+
+
+        <nav class="sidebar-nav">
+
+            <a href="dashboard.html">
+                🏠 Dashboard
+            </a>
+
+            <a href="dashboard.html">
+                📋 All Tasks
+            </a>
+
+            <a href="dashboard.html">
+                ⏳ Pending
+            </a>
+
+            <a href="dashboard.html">
+                ⚡ In Progress
+            </a>
+
+            <a href="dashboard.html">
+                ✓ Completed
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-bottom">
+
+            <a href="profile.html">
+                👤 Profile
+            </a>
+
+
+            <a
+                href="settings.html"
+                class="active"
+            >
+                ⚙ Settings
+            </a>
+
+
+            <a
+                href="login.html"
+                id="logoutBtn"
+            >
+                🚪 Logout
+            </a>
+
+        </div>
+
+    </aside>
+
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="dashboard-main">
+
+
+        <!-- =================================================
+             HEADER
+        ================================================== -->
+
+        <header class="dashboard-header">
+
+            <div>
+
+                <h1>
+                    Settings
+                </h1>
+
+                <p>
+                    Customize your Task Manager
+                </p>
+
+            </div>
+
+
+            <div class="user-profile">
+
+                <div
+                    class="avatar"
+                    id="settingsAvatar"
+                >
+                    U
+                </div>
+
+
+                <div>
+
+                    <strong id="settingsUserName">
+                        User
+                    </strong>
+
+                    <small>
+                        Student
+                    </small>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+
+        <!-- =================================================
+             SETTINGS SECTION
+        ================================================== -->
+
+        <section class="settings-section">
+
+
+            <!-- =================================================
+                 APPEARANCE
+            ================================================== -->
+
+            <div class="settings-card">
+
+                <div class="settings-card-header">
+
+                    <div>
+
+                        <h2>
+                            🎨 Appearance
+                        </h2>
+
+                        <p>
+                            Change how Task Manager looks.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="setting-row">
+
+                    <div>
+
+                        <strong>
+                            Dark Mode
+                        </strong>
+
+                        <p>
+                            Use dark theme for the application.
+                        </p>
+
+                    </div>
+
+
+                    <label class="switch">
+
+                        <input
+                            type="checkbox"
+                            id="darkModeToggle"
+                        >
+
+                        <span class="slider"></span>
+
+                    </label>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 NOTIFICATIONS
+            ================================================== -->
+
+            <div class="settings-card">
+
+                <div class="settings-card-header">
+
+                    <div>
+
+                        <h2>
+                            🔔 Notifications
+                        </h2>
+
+                        <p>
+                            Manage task notifications.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="setting-row">
+
+                    <div>
+
+                        <strong>
+                            Task Notifications
+                        </strong>
+
+                        <p>
+                            Receive reminders about your tasks.
+                        </p>
+
+                    </div>
+
+
+                    <label class="switch">
+
+                        <input
+                            type="checkbox"
+                            id="notificationToggle"
+                        >
+
+                        <span class="slider"></span>
+
+                    </label>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 TASK SETTINGS
+            ================================================== -->
+
+            <div class="settings-card">
+
+                <div class="settings-card-header">
+
+                    <div>
+
+                        <h2>
+                            📋 Task Settings
+                        </h2>
+
+                        <p>
+                            Set your default task preferences.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="setting-row">
+
+                    <div>
+
+                        <strong>
+                            Default Priority
+                        </strong>
+
+                        <p>
+                            Priority used when creating a new task.
+                        </p>
+
+                    </div>
+
+
+                    <select id="defaultPriority">
+
+                        <option value="Low">
+                            Low
+                        </option>
+
+                        <option
+                            value="Medium"
+                            selected
+                        >
+                            Medium
+                        </option>
+
+                        <option value="High">
+                            High
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 ACCOUNT
+            ================================================== -->
+
+            <div class="settings-card">
+
+                <div class="settings-card-header">
+
+                    <div>
+
+                        <h2>
+                            🔒 Account
+                        </h2>
+
+                        <p>
+                            Manage your account.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- PROFILE -->
+
+                <div class="setting-row">
+
+                    <div>
+
+                        <strong>
+                            Profile
+                        </strong>
+
+                        <p>
+                            Update your name and account information.
+                        </p>
+
+                    </div>
+
+
+                    <a
+                        href="profile.html"
+                        class="secondary-btn"
+                    >
+                        View Profile
+                    </a>
+
+                </div>
+
+
+                <!-- LOGOUT -->
+
+                <div class="setting-row">
+
+                    <div>
+
+                        <strong>
+                            Logout
+                        </strong>
+
+                        <p>
+                            Sign out from your account.
+                        </p>
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        class="cancel-btn logout-btn"
+                        id="settingsLogoutBtn"
+                    >
+                        Logout
+                    </button>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 DANGER ZONE
+            ================================================== -->
+
+            <div class="settings-card danger-card">
+
+                <div class="settings-card-header">
+
+                    <div>
+
+                        <h2>
+                            ⚠️ Danger Zone
+                        </h2>
+
+                        <p>
+                            Be careful with these actions.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="setting-row">
+
+                    <div>
+
+                        <strong>
+                            Clear All Tasks
+                        </strong>
+
+                        <p>
+                            Permanently remove all your tasks.
+                        </p>
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        id="clearTasksBtn"
+                        class="danger-btn"
+                    >
+                        Clear Tasks
+                    </button>
+
+                </div>
+
+            </div>
+
+
+        </section>
+
+    </main>
+
+
+
+    <!-- =====================================================
+         MAIN SCRIPT
+    ====================================================== -->
+
+    <script src="script.js"></script>
+
+
+    <!-- =====================================================
+         SETTINGS SCRIPT
+    ====================================================== -->
+
+    <script src="settings.js"></script>
+
+
+</body>
+
+</html>

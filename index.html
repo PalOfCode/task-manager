@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="theme.js"></script>
+
+</head>
+
+<body>
+
+    <header class="navbar">
+        <div class="logo">Task<span>Manager</span></div>
+
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="#features">Features</a>
+            <a href="login.html" class="login-btn">Login</a>
+        </nav>
+    </header>
+
+    <main class="hero">
+
+        <div class="hero-content">
+            <p class="eyebrow">Daily Planner</p>
+            <h1>Manage Your Tasks<br><span>Stay Productive.</span></h1>
+
+            <p>
+                Organize your daily tasks, track your progress,
+                and complete your goals with our simple Task Manager.
+            </p>
+
+            <div class="hero-buttons">
+                <a href="login.html" class="primary-btn">Get Started</a>
+                <a href="#features" class="secondary-btn">Learn More</a>
+            </div>
+        </div>
+
+        <div class="hero-card">
+            <div class="card-header">
+                <h3>Today's Tasks</h3>
+                <span>4 TASKS</span>
+            </div>
+
+            <div class="task-preview completed">
+                <div class="check">
+                    <svg viewBox="0 0 16 16" class="check-mark"><path d="M3 8.5L6.5 12L13 4" /></svg>
+                </div>
+                <div>
+                    <h4>Complete Portfolio</h4>
+                    <p>Completed</p>
+                </div>
+            </div>
+
+            <div class="task-preview in-progress">
+                <div class="check"></div>
+                <div>
+                    <h4>Learn JavaScript</h4>
+                    <p>In Progress</p>
+                </div>
+            </div>
+
+            <div class="task-preview">
+                <div class="check"></div>
+                <div>
+                    <h4>College Assignment</h4>
+                    <p>Pending</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <section id="features" class="features">
+
+        <p class="eyebrow center">What's Inside</p>
+        <h2>Everything You Need</h2>
+        <p class="section-subtitle">
+            Simple tools to help you stay organized and productive.
+        </p>
+
+        <div class="feature-container">
+
+            <div class="feature-card">
+                <div class="feature-icon">✓</div>
+                <h3>Task Management</h3>
+                <p>Create, edit, delete and complete your tasks easily.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3>Priority</h3>
+                <p>Set Low, Medium or High priority for your tasks.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">◔</div>
+                <h3>Track Progress</h3>
+                <p>Monitor your pending and completed tasks from one place.</p>
+            </div>
+
+        </div>
+
+    </section>
+
+    <footer>
+        <p>© 2026 TaskManager. All Rights Reserved.</p>
+    </footer>
+<script src="script.js"></script>
+</body>
+</html>
